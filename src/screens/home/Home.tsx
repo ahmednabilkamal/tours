@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type JSX } from "react";
 import { baseUrl } from "../../services";
 import "./styles.css";
 import { Tour } from "../../components";
 
-type Tour = {
+type TourType = {
   id: string;
   name: string;
   info: string;
@@ -13,7 +13,7 @@ type Tour = {
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [toursData, setToursData] = useState<Tour[]>([]);
+  const [toursData, setToursData] = useState<TourType[]>([]);
 
   useEffect(() => {
     fetchTours();
@@ -22,17 +22,37 @@ const Home = () => {
   const fetchTours = async (): Promise<void> => {
     try {
       const response = await fetch(baseUrl);
-      const tours: Tour[] = await response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const tours: TourType[] = await response.json();
       setToursData(tours);
     } catch (error) {
       console.error("Error fetching tours:", error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
-  const filterTours = async (id: string): Promise<void> => {
+  const filterTours = (id: string): void => {
     const filteredTours = toursData.filter((tour) => tour.id !== id);
     setToursData(filteredTours);
+  };
+
+  const renderEmptyTours = (): JSX.Element => {
+    return (
+      <div className="title">
+        <h2>No tours left</h2>
+        <button
+          className="btn"
+          type="button"
+          style={{ marginTop: "2rem" }}
+          onClick={() => fetchTours()}
+        >
+          Refresh
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -43,9 +63,11 @@ const Home = () => {
       </div>
 
       <div className="tours">
-        {toursData.map((tour) => (
-          <Tour key={tour.id} {...tour} removeSelectedTour={filterTours} />
-        ))}
+        {toursData.length === 0 && !isLoading
+          ? renderEmptyTours()
+          : toursData.map((tour) => (
+              <Tour key={tour.id} {...tour} removeSelectedTour={filterTours} />
+            ))}
       </div>
 
       {isLoading && <p>Loading...</p>}
