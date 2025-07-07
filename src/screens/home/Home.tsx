@@ -30,6 +30,11 @@ const Home = () => {
     setIsLoading(false);
   };
 
+  const filterTours = async (id: string): Promise<void> => {
+    const filteredTours = toursData.filter((tour) => tour.id !== id);
+    setToursData(filteredTours);
+  };
+
   return (
     <section>
       <div className="title">
@@ -39,7 +44,7 @@ const Home = () => {
 
       <div className="tours">
         {toursData.map((tour) => (
-          <Tour key={tour.id} {...tour} />
+          <Tour key={tour.id} {...tour} removeSelectedTour={filterTours} />
         ))}
       </div>
 
