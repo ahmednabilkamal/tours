@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import "./styles.css";
+
 type TourProps = {
   id: string;
   image: string;

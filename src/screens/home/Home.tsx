@@ -1,7 +1,8 @@
 import { useEffect, useState, type JSX } from "react";
+
 import { baseUrl } from "../../services";
-import "./styles.css";
 import { Tour } from "../../components";
+import "./styles.css";
 
 type TourType = {
   id: string;
